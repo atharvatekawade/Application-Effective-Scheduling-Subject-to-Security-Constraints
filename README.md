@@ -1,7 +1,7 @@
 # Application-Effective-Scheduling-Subject-to-Security-Constraints
 This problem is of scheduling applications modeled as a directed acyclic graph in a cost-effective and reliabile way subject to a given security constraints in a multi-cloud system. The model includes the billing mechanisms and costs for transferring data across clouds for different cloud providers. Our proposed methodology is compared with the following state-of-art algorithms:
 
-1) A GSA based hybrid algorithm for bi-objective workflow scheduling in cloud computing - Anubhav Choudhary, Indrajeet Gupta, Vishaka Singh, Prasanta K. Jha: https://www.sciencedirect.com/science/article/pii/S0167739X17303217?casa_token=cuwIFsIBIKoAAAAA:qVrqW-Z-TVC1boJ3BEeL3dA_fe2I1kNMNfqkwmzD7nG1zSNEMsVNC433_C4102X6Z8dsXDWqXt-zBg
+1) A GSA based hybrid algorithm for bi-objective workflow scheduling in cloud computing - Anubhav Choudhary, Indrajeet Gupta, Vishaka Singh, Prasanta K. Jha: https://www.sciencedirect.com/science/article/abs/pii/S0167739X17303217
 2) Genetic Algorithm Framework for Bi-objective Task Scheduling in Cloud Computing Systems - A. S. Ajeena Beegom & M. S. Rajasree : https://link.springer.com/chapter/10.1007/978-3-319-14977-6_38
 
 ## Usage
