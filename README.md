@@ -5,7 +5,7 @@ This problem is of scheduling applications modeled as a directed acyclic graph i
 2) Genetic Algorithm Framework for Bi-objective Task Scheduling in Cloud Computing Systems - A. S. Ajeena Beegom & M. S. Rajasree : https://link.springer.com/chapter/10.1007/978-3-319-14977-6_38
 
 ## Usage
-Clone the repositary and run the command: python main.py -num -itr -p -D -smin -smax, the arguments are explained below:
+Clone the repositary and run the command: python main.py -num -itr -p -V -smin -smax, the arguments are explained below:
 
 1) num: Represents the number of nodes of an Epigenomics task graph.
 2) itr: Represents the number of iterations to run the algorithms, with average results reported at the end.
