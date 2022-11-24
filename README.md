@@ -13,4 +13,7 @@ Clone the repositary and run the command: python main.py -num -itr -p -V -smin -
 4) V: Represents the security constraint as a factor w.r.t the least security constraint.
 5) smin: Represents the lower bound for task computation requirement and edge data.
 6) smax: Represents the upper bound for task computation requirement and edge data.
-Upon running the command and successful execution, we get plots for the cost and makespan of different algorithms. The makespan plot also includes the deadline for reference.
+Upon running the command and successful execution, we get plots for the cost, makespan, reliability and security of different algorithms. The security plot also includes the security constraint for reference.
+
+## Results
+![Figure_1](https://user-images.githubusercontent.com/64606981/203858602-f4c2c1ca-0f21-4df5-8264-96dbb2bf5111.png)
