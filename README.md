@@ -17,4 +17,5 @@ Clone the repositary and run the command: python main.py -num -itr -p -V -smin -
 Upon running the command and successful execution, we get plots for the cost, makespan, reliability and security of different algorithms. The security plot also includes the security constraint for reference. Sample plots are shown below.
 
 ## Results
-![Figure_1](https://user-images.githubusercontent.com/64606981/203858602-f4c2c1ca-0f21-4df5-8264-96dbb2bf5111.png)
+
+![Figure_1](https://user-images.githubusercontent.com/64606981/203923330-4d687583-4372-4a4c-a43a-b300704a02f7.png)
