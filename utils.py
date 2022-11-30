@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from copy import deepcopy
 import config
 
@@ -43,6 +44,55 @@ def ranks():
 
     x.sort(key=lambda x: x[1], reverse= True) 
     return [x[i][0] for i in range(len(x))]
+
+def fcws_ranks():
+    l = [[i, 0] for i in range(len(config.graph))]
+    cap = []
+    p = []
+    for i in range(len(config.center)):
+        if(i%3 == 0):
+            for j in range(len(config.center[i])):
+                cap.append(config.center[i][j])
+                p.append(config.prices[i][j])
+    
+    start = []
+    fins = []
+    rents = []
+
+    cap = np.median(cap)
+    p = np.median(p)
+
+    for i in range(len(config.graph)):
+        start.append(0)
+        fins.append(0)
+        rents.append(0)
+    
+    for i in range(len(config.graph)):
+        s = 0
+        t = 0
+        exec_time = config.size[i]/cap
+        if(i > 0):
+            t = float('inf')
+            for j in range(len(config.graph)):
+                if(config.graph[j][i] > 0):
+                    comm_time = config.graph[j][i]/config.inter
+                    t = min(t, fins[j])
+                    s = max(s, fins[j]+comm_time)
+
+        f = s + exec_time
+        rents[i] = f-t
+    
+    for i in range(len(config.graph)-1, -1, -1):
+        m = 0
+        for j in range(len(config.graph)):
+            if(config.graph[i][j] > 0):
+                m = max(m, l[j][1])
+        
+        l[i][1] = m + p*rents[i]
+    
+    l.sort(key=lambda x: x[1], reverse=True)
+    l = [l[i][0] for i in range(len(config.graph))]
+    return l
 
 def determine_enc(V, message_vul, particle, mp = {}):
     if(mp == {}):
