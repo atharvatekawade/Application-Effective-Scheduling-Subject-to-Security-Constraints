@@ -5,14 +5,16 @@ This problem is of scheduling applications modeled as a directed acyclic graph i
 2) Reliability-Aware Cost-Efficient Scientific Workflows Scheduling Strategy on Multi-Cloud Systems - Xiaoyong Tang : https://ieeexplore.ieee.org/document/9349203
 
 ## Usage
-Clone the repositary and run the command: python main.py -num -itr -p -V -smin -smax, the arguments are explained below:
+Clone the repositary and run the command: python main.py -num -itr -aws -ma -gcp -V -smin -smax, the arguments are explained below:
 
 1) num: Represents the number of nodes of an Epigenomics task graph.
 2) itr: Represents the number of iterations to run the algorithms, with average results reported at the end.
-3) p: Represents the number of cloud providers, which should be a multiple of 3: p/3 for Microsoft Azure, p/3 for AWS and p/3 for GCP type clouds.
-4) V: Represents the security constraint as a factor w.r.t the least security constraint.
-5) smin: Represents the lower bound for task computation requirement and edge data.
-6) smax: Represents the upper bound for task computation requirement and edge data.
+3) aws: Represents the number of cloud providers following AWS pricing.
+4) ma: Represents the number of cloud providers following Microsoft Azure pricing.
+5) gcp: Represents the number of cloud providers following GCP pricing.
+6) V: Represents the security constraint as a factor w.r.t the least security constraint (0 being most secure and 1 being least).
+7) smin: Represents the lower bound for task computation requirement and edge data.
+8) smax: Represents the upper bound for task computation requirement and edge data.
 
 Upon running the command and successful execution, we get plots for the cost, makespan, reliability and security of different algorithms. The security plot also includes the security constraint for reference. Sample plots are shown below.
 
