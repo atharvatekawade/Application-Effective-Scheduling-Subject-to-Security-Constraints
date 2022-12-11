@@ -5,7 +5,8 @@ import config
 
 
 def ranks():
-    avg_bw = (config.inter + (config.providers - 1)*config.ext)/config.providers
+    providers = config.aws_providers + config.ma_providers + config.gcp_providers
+    avg_bw = (config.inter + (providers - 1)*config.ext)/providers
 
     x = [[i, 0] for i in range(len(config.graph))]
 
@@ -44,55 +45,6 @@ def ranks():
 
     x.sort(key=lambda x: x[1], reverse= True) 
     return [x[i][0] for i in range(len(x))]
-
-def fcws_ranks():
-    l = [[i, 0] for i in range(len(config.graph))]
-    cap = []
-    p = []
-    for i in range(len(config.center)):
-        if(i%3 == 0):
-            for j in range(len(config.center[i])):
-                cap.append(config.center[i][j])
-                p.append(config.prices[i][j])
-    
-    start = []
-    fins = []
-    rents = []
-
-    cap = np.median(cap)
-    p = np.median(p)
-
-    for i in range(len(config.graph)):
-        start.append(0)
-        fins.append(0)
-        rents.append(0)
-    
-    for i in range(len(config.graph)):
-        s = 0
-        t = 0
-        exec_time = config.size[i]/cap
-        if(i > 0):
-            t = float('inf')
-            for j in range(len(config.graph)):
-                if(config.graph[j][i] > 0):
-                    comm_time = config.graph[j][i]/config.inter
-                    t = min(t, fins[j])
-                    s = max(s, fins[j]+comm_time)
-
-        f = s + exec_time
-        rents[i] = f-t
-    
-    for i in range(len(config.graph)-1, -1, -1):
-        m = 0
-        for j in range(len(config.graph)):
-            if(config.graph[i][j] > 0):
-                m = max(m, l[j][1])
-        
-        l[i][1] = m + p*rents[i]
-    
-    l.sort(key=lambda x: x[1], reverse=True)
-    l = [l[i][0] for i in range(len(config.graph))]
-    return l
 
 def determine_enc(V, message_vul, particle, mp = {}):
     if(mp == {}):
@@ -169,8 +121,6 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
         enc_time = 0
         for j in range(len(config.graph)):
             if(config.graph[j][l[i]] > 0):
-                # if(particle[l[i]] != particle[j]):
-                #     dec_time += config.graph[j][l[i]]*config.suites[enc[j][l[i]]][1]/(config.center[pr1][cl1] * 16)
                 s = max(s, M[j][2])
                 
             if(config.graph[l[i]][j] > 0):
@@ -178,7 +128,6 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
                 comm_time = 0
 
                 if(particle[l[i]] != particle[j]):
-                    # enc_time += config.graph[l[i]][j]*config.suites[enc[l[i]][j]][1]/(config.center[pr1][cl1] * 16)
                     if(pr1 == pr2):
                         comm_time = config.graph[l[i]][j]/config.inter
                     
@@ -212,14 +161,13 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
 
         pr = mp[id][0]
         cl = mp[id][1]
-        slots = 0
-        if(pr%3 == 0):
+        if(pr < config.aws_providers):
             slots = math.ceil(time/3600)
-        elif(pr%3 == 1):
+        elif(pr < config.aws_providers + config.ma_providers):
             slots = math.ceil(time/60)
         else:
-            tp = int((pr-2)/3)
-            cost += config.fixed_prices[tp][cl]
+            cost += config.fixed_prices[pr - config.aws_providers - config.ma_providers][cl]
+            slots = max(math.ceil(time/60 - 10), 0)
                 
         cost += slots*config.prices[pr][cl]
         rel = rel * math.exp(-time * config.params[pr][pr])
@@ -232,8 +180,8 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
                 data = config.graph[i][j]/1000
                 if(pr == pr1):
                     continue
-                if(pr%3 == 0):
-                    if(pr1%3 == 0):
+                if(pr < config.aws_providers):
+                    if(pr1 < config.aws_providers):
                         cost += 0.02*data
                     elif(data <= 100):
                         cost += 0
@@ -245,9 +193,9 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
                         cost += 0.07*data
                     else:
                         cost += 0.05*data
-                
-                elif(pr%3 == 1):
-                    if(pr1%3 == 1):
+                        
+                elif(pr < config.aws_providers + config.ma_providers):
+                    if(pr1 < config.aws_providers + config.ma_providers):
                         cost += 0.08*data
                     elif(data <= 100):
                         cost += 0
@@ -259,9 +207,9 @@ def simulate_pso(particle, mp = {}, l = [], enc = []):
                         cost += 0.07*data
                     else:
                         cost += 0.06*data
-                
+                        
                 else:
-                    if(pr1%3 == 2):
+                    if(pr1 >= config.aws_providers + config.ma_providers):
                         cost += 0.05*data
                     elif(data <= 1*1000):
                         cost += 0.19*data
@@ -335,14 +283,13 @@ def simulate_pso_actual(particle, mp = {}, l = [], enc = []):
         pr = mp[id][0]
         cl = mp[id][1]
 
-        if(pr%3 == 0):
+        if(pr < config.aws_providers):
             slots = math.ceil(time/3600)
-        elif(pr%3 == 1):
+        elif(pr < config.aws_providers + config.ma_providers):
             slots = math.ceil(time/60)
         else:
-            tp = int((pr-2)/3)
             slots = max(math.ceil(time/60)-10, 0)
-            cost += config.fixed_prices[tp][cl]
+            cost += config.fixed_prices[pr - config.aws_providers - config.ma_providers][cl]
                 
         cost += slots*config.prices[pr][cl]
         rel = rel * math.exp(-time * config.params[pr][pr])
@@ -355,8 +302,9 @@ def simulate_pso_actual(particle, mp = {}, l = [], enc = []):
                 data = config.graph[i][j]/1000
                 if(pr == pr1):
                     continue
-                if(pr%3 == 0):
-                    if(pr1%3 == 0):
+
+                if(pr < config.aws_providers):
+                    if(pr1 < config.aws_providers):
                         cost += 0.02*data
                     elif(data <= 100):
                         cost += 0
@@ -368,9 +316,9 @@ def simulate_pso_actual(particle, mp = {}, l = [], enc = []):
                         cost += 0.07*data
                     else:
                         cost += 0.05*data
-                
-                elif(pr%3 == 1):
-                    if(pr1%3 == 1):
+                        
+                elif(pr < config.aws_providers + config.ma_providers):
+                    if(pr1 < config.aws_providers + config.ma_providers):
                         cost += 0.08*data
                     elif(data <= 100):
                         cost += 0
@@ -382,9 +330,9 @@ def simulate_pso_actual(particle, mp = {}, l = [], enc = []):
                         cost += 0.07*data
                     else:
                         cost += 0.06*data
-                
+                        
                 else:
-                    if(pr1%3 == 2):
+                    if(pr1 >= config.aws_providers + config.ma_providers):
                         cost += 0.05*data
                     elif(data <= 1*1000):
                         cost += 0.19*data
@@ -483,7 +431,6 @@ def heft(mp = {}):
         pr, cl, _ = mp[k]
         R[k] = [pr, cl, 0, 0]
 
-    # s, c = simulate_pso(particle, mapping, orders[it])
     for i in range(len(l)):
         min_vm = -1
         min_fin = float('inf')

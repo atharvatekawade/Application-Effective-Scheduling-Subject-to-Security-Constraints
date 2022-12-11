@@ -1,8 +1,10 @@
 import random
 import numpy as np
 
-def init(n):
-    global providers
+def init(aws, ma, gcp, n):
+    global aws_providers
+    global ma_providers
+    global gcp_providers
     global smin
     global smax
     global inter
@@ -23,7 +25,10 @@ def init(n):
     global message_vul
     global v_max
 
-    providers = 6
+    aws_providers = aws
+    ma_providers = ma
+    gcp_providers = gcp
+
     smin = 10
     smax = 10**5
     inter = 100
@@ -135,10 +140,10 @@ def init(n):
     for i in range(len(graph)):
         size.append(random.randint(smin, smax))
 
-    for i in range(int(providers/3)):
+    for i in range(gcp_providers):
         fixed_prices.append([])
 
-    for i in range(providers):
+    for i in range(aws_providers + ma_providers + gcp_providers):
         vms = random.randint(1, 32)
         center.append([])
         prices.append([])
@@ -150,15 +155,14 @@ def init(n):
                 center[i].append(cap)
                 c = unit_price*center[i][j]
                 c = np.random.normal(loc=c, scale=c/10) 
-                if(i%3 == 0):
+                if(i < aws_providers):
                     prices[i].append(c)
-                elif(i%3 == 1):
+                elif(i < aws_providers + ma_providers):
                     c = c*60*(1-random.randint(1,3)/10000)
                     prices[i].append(c)
                     
                 else:
-                    tp = int((i-2)/3)
-                    fixed_prices[tp].append(c*random.randint(11, 15))
+                    fixed_prices[i - aws_providers - ma_providers].append(c*random.randint(11, 15))
                     prices[i].append(c)
                 j += 1
 
@@ -180,14 +184,12 @@ def init(n):
 
     params = []
 
-    for i in range(providers):
+    for i in range(len(center)):
         params.append([])
-        for j in range(providers):
+        for j in range(len(center)):
             params[i].append(0)
-    
-    assert(len(params) == len(params[0]) == providers == len(center))
 
-    for i in range(providers):
-        for j in range(providers):
+    for i in range(len(center)):
+        for j in range(len(center)):
             params[i][j] = random.randint(10, 100)/10**9
             params[j][i] = params[i][j]

@@ -42,15 +42,11 @@ def reverse_allocation(l = [], mp = {}):
                 rel = 1
 
                 for k in range(len(config.graph)):
-                    # if(config.graph[k][task_order[i][j]] > 0):
-                    #     dec_time += config.graph[k][task_order[i][j]]*suites[enc[k][task_order[i][j]]][1]/(config.center[pr1][cl1] * 16)
-                        
                     if(config.graph[task_order[i][j]][k] > 0):
                         pr2, _, _ = mp[particle[k]]
                         comm_time = 0
 
                         if(id != particle[k]):
-                            # enc_time += config.graph[task_order[i][j]][k]*suites[enc[task_order[i][j]][k]][1]/(config.center[pr1][cl1] * 16)
                             if(pr1 == pr2):
                                 comm_time = config.graph[task_order[i][j]][k]/config.inter
                                 
@@ -64,8 +60,8 @@ def reverse_allocation(l = [], mp = {}):
                         if(pr1 == pr2):
                             continue
 
-                        if(pr1%3 == 0):
-                            if(pr2%3 == 0):
+                        if(pr1 < config.aws_providers):
+                            if(pr2 < config.aws_providers):
                                 cost += 0.02*data
                             elif(data <= 100):
                                 cost += 0
@@ -78,8 +74,8 @@ def reverse_allocation(l = [], mp = {}):
                             else:
                                 cost += 0.05*data
                         
-                        elif(pr1%3 == 1):
-                            if(pr2%3 == 1):
+                        elif(pr1 < config.aws_providers + config.ma_providers):
+                            if(pr2 < config.aws_providers + config.ma_providers):
                                 cost += 0.08*data
                             elif(data <= 100):
                                 cost += 0
@@ -93,7 +89,7 @@ def reverse_allocation(l = [], mp = {}):
                                 cost += 0.06*data
                         
                         else:
-                            if(pr2%3 == 2):
+                            if(pr2 >= config.aws_providers + config.ma_providers):
                                 cost += 0.05*data
                             elif(data <= 1*1000):
                                 cost += 0.19*data
@@ -104,14 +100,13 @@ def reverse_allocation(l = [], mp = {}):
                 
                 pt = dec_time + exec_time + enc_time + transfer_time
 
-                if(pr1%3 == 0):
+                if(pr1 < config.aws_providers):
                     slots = math.ceil(pt/3600)
-                elif(pr1%3 == 1):
+                elif(pr1 < config.aws_providers + config.ma_providers):
                     slots = math.ceil(pt/60)
                 else:
                     slots = max(math.ceil(pt/60)-10, 0)
-                    tp = int((pr1-2)/3)
-                    cost += config.fixed_prices[tp][cl1]
+                    cost += config.fixed_prices[pr1 - config.aws_providers - config.ma_providers][cl1]
                         
                 cost += slots*config.prices[pr1][cl1]
                 rel = rel * math.exp(-config.params[pr1][pr1] * pt)
@@ -133,8 +128,8 @@ def reverse_allocation(l = [], mp = {}):
                 elif(min_span != max_span):
                     metric = 0.8*(vms_task[id][2] - min_cost)/(max_cost - min_cost) + 0.2*(vms_task[id][1] - min_span)/(max_span - min_span)
                     
-                # if(min_rel != max_rel):
-                #     metric = 0.9*(vms_task[id][2] - min_cost)/(max_cost - min_cost) + 0.1*(max_rel - vms_task[id][3])/(max_rel - min_rel)
+                elif(min_rel != max_rel):
+                    metric = 0.9*(vms_task[id][2] - min_cost)/(max_cost - min_cost) + 0.1*(max_rel - vms_task[id][3])/(max_rel - min_rel)
 
                 vms_task[id].append(metric)
                 

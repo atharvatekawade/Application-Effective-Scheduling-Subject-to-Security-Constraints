@@ -1,11 +1,60 @@
 from copy import deepcopy
+import numpy as np
 import math
-import config, utils
+import config
 
+def fcws_ranks():
+    l = [[i, 0] for i in range(len(config.graph))]
+    cap = []
+    p = []
+    for i in range(len(config.center)):
+        if(i%3 == 0):
+            for j in range(len(config.center[i])):
+                cap.append(config.center[i][j])
+                p.append(config.prices[i][j])
+    
+    start = []
+    fins = []
+    rents = []
+
+    cap = np.median(cap)
+    p = np.median(p)
+
+    for i in range(len(config.graph)):
+        start.append(0)
+        fins.append(0)
+        rents.append(0)
+    
+    for i in range(len(config.graph)):
+        s = 0
+        t = 0
+        exec_time = config.size[i]/cap
+        if(i > 0):
+            t = float('inf')
+            for j in range(len(config.graph)):
+                if(config.graph[j][i] > 0):
+                    comm_time = config.graph[j][i]/config.inter
+                    t = min(t, fins[j])
+                    s = max(s, fins[j]+comm_time)
+
+        f = s + exec_time
+        rents[i] = f-t
+    
+    for i in range(len(config.graph)-1, -1, -1):
+        m = 0
+        for j in range(len(config.graph)):
+            if(config.graph[i][j] > 0):
+                m = max(m, l[j][1])
+        
+        l[i][1] = m + p*rents[i]
+    
+    l.sort(key=lambda x: x[1], reverse=True)
+    l = [l[i][0] for i in range(len(config.graph))]
+    return l
 
 def simulate_list(mp = {}, l = []):
     if(l == []):
-        l =  utils.fcws_ranks()
+        l =  fcws_ranks()
     
     if(mp == {}):
         mp = deepcopy(config.mapping)
@@ -52,8 +101,8 @@ def simulate_list(mp = {}, l = []):
                     if(pr == pr1):
                         continue
 
-                    if(pr%3 == 0):
-                        if(pr1%3 == 0):
+                    if(pr < config.aws_providers):
+                        if(pr1 < config.aws_providers):
                             cost += 0.02*data
                         elif(data <= 100):
                             cost += 0
@@ -65,9 +114,9 @@ def simulate_list(mp = {}, l = []):
                             cost += 0.07*data
                         else:
                             cost += 0.05*data
-                    
-                    elif(pr%3 == 1):
-                        if(pr1%3 == 1):
+                        
+                    elif(pr < config.aws_providers + config.ma_providers):
+                        if(pr1 < config.aws_providers + config.ma_providers):
                             cost += 0.08*data
                         elif(data <= 100):
                             cost += 0
@@ -79,9 +128,9 @@ def simulate_list(mp = {}, l = []):
                             cost += 0.07*data
                         else:
                             cost += 0.06*data
-                    
+                        
                     else:
-                        if(pr1%3 == 2):
+                        if(pr1 >= config.aws_providers + config.ma_providers):
                             cost += 0.05*data
                         elif(data <= 1*1000):
                             cost += 0.19*data
@@ -100,16 +149,15 @@ def simulate_list(mp = {}, l = []):
 
             r = r * math.exp(-config.params[pr][pr] * pt)
 
-            if(pr%3 == 0):
+            if(pr < config.aws_providers):
                 num_slots = math.ceil(pt/60)
                     
-            elif(pr%3 == 1):
+            elif(pr < config.aws_providers + config.ma_providers):
                     num_slots = math.ceil(pt/3600)
                     
             else:
-                num_slots = max(0, math.ceil((pt-600)/60))
-                tp = int((pr-2)/3)
-                cost += config.fixed_prices[tp][cl]
+                num_slots = max(0, math.ceil(pt/60) - 10)
+                cost += config.fixed_prices[pr - config.aws_providers - config.ma_providers][cl]
                     
             cost += config.prices[pr][cl] * num_slots
             d[id] = [id, s, f, t, cost, r]
