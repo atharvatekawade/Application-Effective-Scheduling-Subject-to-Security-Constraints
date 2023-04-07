@@ -7,7 +7,7 @@ This problem is of scheduling applications modeled as a directed acyclic graph i
 ## Usage
 Clone the repositary and run the command: python main.py -num -itr -aws -ma -gcp -V -smin -smax, the arguments are explained below:
 
-1) num: Represents the number of nodes of an Epigenomics task graph.
+1) ff: Represents the path of xml file containing the DAG.
 2) itr: Represents the number of iterations to run the algorithms, with average results reported at the end.
 3) aws: Represents the number of cloud providers following AWS pricing.
 4) ma: Represents the number of cloud providers following Microsoft Azure pricing.
