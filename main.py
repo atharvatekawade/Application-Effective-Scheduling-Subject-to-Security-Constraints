@@ -9,7 +9,7 @@ vv = 0
 parser = argparse.ArgumentParser()
 
 #-db DATABASE -u USERNAME -p PASSWORD -size 20000
-parser.add_argument("-num", dest = "num", default = 24, type=int)
+parser.add_argument("-ff", dest = "ff", default = "Montage_25.xml", type=str)
 parser.add_argument("-itr", dest = "itr", default = 5, type=int)
 parser.add_argument("-aws", dest = "aws", default = 2, type=int)
 parser.add_argument("-ma", dest = "ma", default = 2, type=int)
@@ -25,7 +25,7 @@ config.smax = args.smax
 
 for gen in range(args.itr):
     print("Iteration: ", gen+1)
-    config.init(args.aws, args.ma, args.gcp, args.num)
+    config.init(args.aws, args.ma, args.gcp, args.ff)
     _, _, _, gsa_particle = gsa.gsa(mp = config.mp, enc = [])
     my_particle = lbs.reverse_allocation(mp = config.mp)
     fcws_particle = fcws.simulate_list(mp = config.mp)

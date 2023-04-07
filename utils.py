@@ -4,6 +4,35 @@ from copy import deepcopy
 import config
 
 
+def topologicalSortUtil(v,visited,stack):
+ 
+    # Mark the current node as visited.
+    visited[v] = True
+ 
+    # Recur for all the vertices adjacent to this vertex
+    for i in range(len(config.graph[v])):
+        if visited[i] == False and config.graph[v][i] > 0:
+            topologicalSortUtil(i,visited,stack)
+ 
+    # Push current vertex to stack which stores result
+    stack.insert(0,v)
+ 
+# The function to do Topological Sort. It uses recursive
+# topologicalSortUtil()
+def topologicalSort():
+    # Mark all the vertices as not visited
+    visited = [False]*len(config.graph)
+    stack =[]
+ 
+    # Call the recursive helper function to store Topological
+    # Sort starting from all vertices one by one
+    for i in range(len(config.graph)):
+        if visited[i] == False:
+            topologicalSortUtil(i,visited,stack)
+ 
+    # Print contents of stack
+    return stack
+
 def ranks():
     providers = config.aws_providers + config.ma_providers + config.gcp_providers
     avg_bw = (config.inter + (providers - 1)*config.ext)/providers
@@ -26,7 +55,9 @@ def ranks():
     
     avg_enc_time = sum(enc_times)/len(enc_times)
 
-    for i in range(len(config.graph)-1, -1, -1):
+    tt = topologicalSort()[::-1]
+
+    for i in tt:
         mt = 0
         comm_time = 0
         enc_time = 0
